@@ -1,6 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
-  Animation.init();
-  Inventory.init();
-  Recipes.init();
-  Shopping.init();
+  chargerAliments();
+  afficherAliments();
+
+  chargerDepenses();
+  verifierChangementDeMois();
+  afficherDepenses();
+
+  chargerRecettes();
+  afficherRecettes();
+
+  afficherPage("inventaire");
 });
