@@ -1,13 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  chargerAliments();
-  afficherAliments();
+  Inventory.init();
+  Meals.init();
+  Shopping.init();
+  Recipes.init();
+  Navigation.init();
 
-  chargerDepenses();
-  verifierChangementDeMois();
-  afficherDepenses();
-
-  chargerRecettes();
-  afficherRecettes();
-
-  afficherPage("inventaire");
+  console.log("App lancée 🚀");
 });
