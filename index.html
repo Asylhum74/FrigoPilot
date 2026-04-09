@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport", user-scalable=no">
+<meta charset="UTF-8">
+<title>Mon Organisation</title>
+	
+<style>
+/* ==========================
+   🌟 STYLES GÉNÉRAUX
+========================== */ 
+:root{--bg:#f5f7fb; --card:#ffffff; --primary:#4f46e5; --primary-light:#eef2ff;--success:#22c55e;
+  --warning:#f59e0b; --danger:#ef4444; --text:#1f2937; --muted:#6b7280; --radius:16px; --shadow:0 8px 24px rgba(0,0,0,0.08); }
+*{box-sizing:border-box}
+body{margin:0; font-family:Inter, system-ui, sans-serif; padding: 15px;  margin: 0; width: 100%; background:var(--bg); color:var(--text);
+}
+html, body {height: 100%;}
+.header{background:var(--card); box-shadow:var(--shadow); padding:18px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky;
+  top:0; z-index:10; }
+.header h1{margin:0; font-size:20px; }
+.header-actions{display:flex; gap:10px; }
+.layout {display: flex; flex-direction: column; gap: 20px; min-height: 100vh; width:100%; }
+.sidebar {display: flex; gap: 10px; background: #0f172a; padding: 12px; border-radius: 12px; width:100%; }
+.nav-title{font-size:12px; text-transform:uppercase; opacity:.6; margin:18px 12px 8px; }
+.nav-btn{width:100%; border:none; background:transparent; color:white; padding:12px 14px; border-radius:12px; text-align:center; cursor:pointer; font-weight:600;
+  opacity:.9; }
+.nav-btn:hover{background:rgba(255,255,255,.08); }
+.nav-btn.active{background:var(--primary); }
+.content{padding:28px; flex: 1; width:100%; }
+.card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:22px; }
+.card h2{margin:0 0 14px 0; font-size:18px; }
+.btn{border:none; border-radius:12px; padding:10px 14px;min-width:250px; font-weight:600; cursor:pointer; background:var(--primary); color:white; }
+.btn.secondary{background:#e5e7eb; color:#111827;min-width:100px; }
+.btn.success{ background:var(--success); min-width:150px; }
+.btn.warning{ background:var(--warning); }
+.btn.danger{ background:var(--danger); }
+.btn:hover{ filter:brightness(1.05); }
+.list{display:flex; flex-direction:column; gap:10px; }
+.row{display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#f9fafb; border-radius:12px; }
+.row-left{display:flex; flex-direction:column; }
+.row-title{font-weight:600; }
+.row-sub{font-size:13px; color:var(--muted); }
+.badge{font-size:12px; padding:4px 10px; border-radius:999px; font-weight:600; }
+.form-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+input, select{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb; font-size:14px; }
+.modal{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; }
+.modal-box{background:white; width:420px; max-width:95%; border-radius:18px; padding:22px; box-shadow:var(--shadow); }
+.modal-box h3{margin-top:0; }
+/* ==========================
+   ⚡ PAGES
+========================== */
+.page {display: none; }
+
+  /* ==========================
+   🍽 ALIMENTAIRE
+========================== */
+ul { list-style: none; padding: 0; max-height: 400px; overflow-y: auto; margin-top: 10px; }
+li { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin:5px 0; border-bottom:1px solid #ccc; padding:5px;
+    word-wrap:break-word; }
+.actions {display: inline-flex; gap: 6px; margin-left: 10px; }
+.urgent {color: red; font-weight: bold; display: flex; align-items: center; flex: 1; }
+.ok {color: black; display: flex; align-items: center; flex: 1; }
+.course-checkbox {width: 20px; height: 20px; cursor: pointer; }
+.form-section {margin-bottom: 25px; }
+#listeAliments {min-height: calc(100vh - 300px); overflow-y: auto; }
+.repas-actions {display: flex; gap: 12px; margin-top: 15px; }
+.repas-actions button {flex: 1; padding: 12px; font-size: 1em; }
+#listeAliments button {padding: 8px 12px; font-size: 1.1em; }
+
+/* ==========================
+   🧽 PROPRETÉ
+========================== */
+.room {margin-top: 20px; padding: 12px; border-radius: 10px; background: rgba(0,0,0,0.05); }
+.task {display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 1.1em; }
+.task input {width: 22px; height: 22px; }
+.progress-bar {height: 10px; background: #ddd; border-radius: 10px; overflow: hidden; margin: 6px 0 12px 0; }
+.progress-fill {height: 100%; width: 0%; background: #2ecc71; transition: width 0.3s ease; }
+
+/* ==========================
+   BUDGET
+========================== */
+#page-budget {display: flex; flex-direction: column; }
+#budgetListe {min-height: calc(100vh - 300px); overflow-y: auto; }
+#budgetListe .actions {display: flex; gap: 12px; margin-top: 15px; }
+#budgetListe .actions button {flex: 1; padding: 12px; font-size: 1em; }
+.list-item {display:flex; justify-content:space-between; align-items:center; padding:12px; border-radius:10px; margin-bottom:8px; }
+
+/* ==========================
+   🌙 MODE SOMBRE
+========================== */
+.dark {background: #121212; color: #e0e0e0; }
+.dark input, .dark select{background: #1e1e1e; color: #e0e0e0; border: 1px solid #444; }
+.dark li {border-bottom: 1px solid #333; }
+.dark strong, .dark li span, .dark h1, .dark h2 {color: #ffffff; }
+.dark .room {background: rgba(255,255,255,0.05); }
+.dark .header {background: rgba(255,255,255,0.05); }
+.dark .sidebar {background: rgba(255,255,255,0.05); }
+.dark .content {background: rgba(255,255,255,0.05); }
+.dark .card {background: rgba(255,255,255,0.05); }
+.dark .progress-bar {background: #333;}
+.toggle {margin: 10px 0; }
+
+/* ==========================
+   🖤 POPUPS
+========================== */
+.popup {position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.popup-content {background: #1e1e1e; color: white; width: 100%; max-width: 500px; padding: 30px; border-radius: 15px; display: flex; 
+                flex-direction: column; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); max-height: 90vh; overflow-y: auto; }
+.popup-content input,
+.popup-content select,
+.popup-content button {font-size: 1.1em; padding: 12px; border-radius: 10px; }
+.popup-actions {display: flex; gap: 10px; }
+.popup-actions button {flex: 1; }
+.delete-btn {background: #c0392b; color: white; font-size: 1.2em; padding: 14px; }
+
+/* ==========================
+    TELEPHONE
+========================== */
+@media (max-width: 900px) {
+  .layout {flex-direction: column; min-height: 100vh; width:100%; }
+  .sidebar {width: 100%; }
+  .content {flex: 1; width:100%; }
+}
+</style>
+
+</head>
+  
+<body>
+<!-- ==========================
+   🏠 BANDEAU PRINCIPALE
+========================== -->
+<div class="layout">
+	<div class="header">
+  		<h1>Gestion Maison</h1>
+  		<div class="header-actions">
+    		<button class="btn secondary" onclick="toggleDarkMode()">Mode sombre</button>
+  		</div>
+  	</div>
+ 	<div class="sidebar">
+    	<button class="nav-btn" onclick="afficherPage('inventaire')">📦 Inventaire</button>
+    	<button class="nav-btn" onclick="afficherPage('repas')">🍽 Repas </button>
+    	<button class="nav-btn" onclick="afficherPage('courses')">🛒 Courses</button>
+    	<button class="nav-btn" onclick="afficherPage('recettes')">📖 Recettes</button>
+    	<button class="nav-btn" onclick="afficherPage('budget')">💰 Budget</button>
+    	<button class="nav-btn" onclick="afficherPage('historique')">📋 Historique</button>
+    	<button class="nav-btn" onclick="afficherPage('proprete')">🧽 Ménage</button>
+  	</div>
+  <main class="content">
+
+<!-- ==========================
+   🍽 INVENTAIRE
+========================== -->  
+    <div class="card" id="page-inventaire" style="display:none;">
+      <h2>📦 Inventaire</h2>
+
+      <div class="form-grid" style="margin-bottom:16px">
+        <input type="text" id="nom" placeholder="Nom produit">
+        <input type="number" id="quantite" placeholder="Quantité">
+        <input type="text" id="unite" placeholder="Ex: g, litre, pcs">
+        <input type="number" id="portions" placeholder="Portions par unité">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="date" id="peremption">
+          <label style="display: flex; align-items: center; gap: 5px; margin: 0;">
+            <input type="checkbox" id="sansDate" style="transform: scale(1.5);">
+          </label>
+        </div>
+        <select id="categorie">
+          <option value="Choisir catégorie">Choisir catégorie</option>
+          <option value="Boisson">Boisson</option>
+          <option value="Produit laitier">Produit laitier</option>
+          <option value="Légume">Légume</option>
+          <option value="Fruit">Fruit</option>
+          <option value="Viande">Viande</option>
+          <option value="Poisson">Poisson</option>
+          <option value="Féculent">Féculent</option>
+          <option value="Sucré">Sucré</option>
+          <option value="Sauce">Sauce</option>
+          <option value="Epice">Epice</option>
+          <option value="Sec">Sec</option>
+          <option value="Plat préparé">Plat préparé</option>
+          <option value="Hygiène">Hygiène</option>
+        </select>
+        <button class="btn success" onclick="ajouterOuModifierAliment()">Ajouter</button>
+      </div>
+
+      <input type="text" id="recherche" placeholder="🔍 Rechercher un aliment..." oninput="afficherAliments()">
+      <ul class="list" id="listeAliments"></ul>
+  	</div>
+	
+<!-- ==========================
+   🍽 REPAS
+========================== -->  
+    <div class="card" id="page-repas" style="display:none;">
+      <h2>🍽️ Repas de la semaine</h2>
+  
+      <table border="1" cellpadding="5" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Jour</th>
+              <th>Petit-déjeuner</th>
+              <th>Déjeuner</th>
+              <th>Dîner</th>
+              <th>Autre</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lundi</td>
+              <td><input type="text" class="repas" data-jour="Lundi" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Lundi" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Lundi" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Lundi" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+            <tr>
+              <td>Mardi</td>
+              <td><input type="text" class="repas" data-jour="Mardi" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Mardi" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Mardi" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Mardi" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+            <tr>
+              <td>Mercredi</td>
+              <td><input type="text" class="repas" data-jour="Mercredi" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Mercredi" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Mercredi" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Mercredi" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+            <tr>
+              <td>Jeudi</td>
+              <td><input type="text" class="repas" data-jour="Jeudi" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Jeudi" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Jeudi" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Jeudi" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+            <tr>
+              <td>Vendredi</td>
+              <td><input type="text" class="repas" data-jour="Vendredi" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Vendredi" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Vendredi" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Vendredi" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+            <tr>
+              <td>Samedi</td>
+              <td><input type="text" class="repas" data-jour="Samedi" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Samedi" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Samedi" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Samedi" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+            <tr>
+              <td>Dimanche</td>
+              <td><input type="text" class="repas" data-jour="Dimanche" data-repas="Petit-déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Dimanche" data-repas="Déjeuner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Dimanche" data-repas="Dîner" onclick="ouvrirPopupRepas(this)" readonly></td>
+              <td><input type="text" class="repas" data-jour="Dimanche" data-repas="Autre" onclick="ouvrirPopupRepas(this)" readonly></td>
+            </tr>
+        </tbody>
+      </table>
+	  <p>
+      <button class="btn" onclick="nouvelleSemaine()">🆕 Nouvelle semaine</button>
+      <button class="btn" id="btnSauvegardeRepas" onclick="sauvegarderRepas()">💾 Sauvegarder la semaine</button>
+      <button class="btn" onclick="chargerRepas()">🔄 Charger la semaine</button>
+      <button class="btn" id="btnListeCourse" onclick="genererListeCourses()">🛒 Générer la liste de courses</button>
+	  </p>
+    </div>
+
+<!-- ==========================
+   🍽 Courses
+========================== -->  
+    <div class="card" id="page-courses" style="display:none;">
+      <h2>🛒 Liste de courses</h2>
+      <div id="listeCoursesContainer"></div>
+    </div>
+
+<!-- ==========================
+   🍽 Recettes
+========================== --> 
+    <div class="card" id="page-recettes" style="display:none;">
+      <h2>📖 Mes Recettes</h2>
+      <input id="recetteNom" placeholder="Nom de la recette">
+      <p><input id="recetteIngredients" placeholder="Ex: Tomate, Lait, Oeuf"></p>
+      <button class="btn success" onclick="ajouterRecette()">Ajouter</button>
+      <h3>Liste des recettes :</h3>
+      <ul class="list" id="listeRecettes"></ul>
+    </div>
+  
+<!-- ==========================
+   🧽 PROPRETÉ
+========================== -->
+    <div class="card" id="page-proprete" style="display:none;">
+      <h2>🧽 Propreté</h2>
+      <div id="listeTachesProprete"></div>
+      <button class="btn" onclick="resetProprete()">🔄 Nouvelle semaine</button>
+    </div>
+
+<!-- ==========================
+   💰 BUDGET
+========================== -->
+    <div class="card" id="page-budget" style="display:none;">
+      <h2>💰 Budget mensuel</h2>
+      <div id="budget-depenses" style="margin-top: 20px;">
+        <h3>Ajouter une dépense</h3>
+        <input id="budgetMontant" placeholder="Ex: 25">
+        <p><select id="budgetCategorie">
+          <option>Nourriture</option>
+          <option>Logement</option>
+          <option>Voiture</option>
+          <option>Loisir</option>
+          <option>Abonnement</option>
+        </select></p>
+        <input id="budgetNote" placeholder="Ex: courses lidl">
+        <p><button class="btn success" onclick="ajouterDepense()">Ajouter</button></p>
+        <h3>Total du mois : <span id="budgetTotal">0 €</span></h3>
+        <div style="display: flex; align-items: center; justifyContent: space-between; marginBottom: 10px; gap:10px;">
+          <h3>Dépenses :</h3>
+          <div class="budget-actions">
+            <button class="btn" onclick="nouveauMois()"> Réinitialiser le budget</button>
+          </div>
+        </div>
+        <ul class="list" id="budgetListe"></ul>
+      </div>
+	</div>
+<!-- ==========================
+   📋 HISTORIQUE
+========================== -->
+      <div class="card" id="page-historique" style="display:none;">
+      	<h2>📋 Historique</h2>
+        	<ul id="historiqueListe"></ul>
+      </div>
+      
+	</main>
+</div>
+<script>
+// ------------------- GESTION BOUTON ----------------
+const buttons = document.querySelectorAll(".nav-btn");
+
+buttons.forEach(button => {
+  button.addEventListener("click", () => {
+    buttons.forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+  });
+});
+	
+// ------------------- MODE SOMBRE -------------------
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+}
+function toggleDarkMode() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+}
+
+/* =========================
+   Alimentaire
+========================= */
+let aliments = [];
+let indexEnCours = -1;
+
+// Charger les aliments depuis localStorage
+function chargerAliments() {
+  const data = localStorage.getItem("aliments");
+  if(data) aliments = JSON.parse(data);
+}
+// Sauvegarder les aliments dans localStorage
+function sauvegarderAliments() {
+  localStorage.setItem("aliments", JSON.stringify(aliments));
+}
+// Ajouter ou modifier un aliment
+function ajouterOuModifierAliment() {
+  const nom = document.getElementById("nom").value;
+  const quantite = document.getElementById("quantite").value;
+  const unite = document.getElementById("unite").value;
+  const sansDate = document.getElementById("sansDate").checked;
+  const peremption = sansDate ? null : document.getElementById("peremption").value;
+  const categorie = document.getElementById("categorie").value;
+  const portions = parseInt(document.getElementById("portions").value) || 1;
+  if(!nom || !quantite || !unite || !categorie) {
+    alert("Veuillez remplir tous les champs !");
+    return;
+  }
+  const nouvelAliment = {nom, quantite, unite, peremption, categorie, portions};
+  if(indexEnCours === -1) {
+    aliments.push(nouvelAliment);
+  } else {
+    aliments[indexEnCours] = nouvelAliment;
+    indexEnCours = -1;
+    document.querySelector("button[onclick='ajouterOuModifierAliment()']").textContent = "Ajouter";
+  }
+  // Réinitialiser le formulaire
+  document.getElementById("nom").value = "";
+  document.getElementById("quantite").value = "";
+  document.getElementById("unite").value = "";
+  document.getElementById("peremption").value = "";
+  document.getElementById("categorie").value = "Choisir catégorie";
+  document.getElementById("portions").value = "";
+  document.getElementById("sansDate").checked = false; 
+  sauvegarderAliments();
+  afficherAliments();
+}
+// Affichage
+function calculerJoursRestants(dateString) {
+  const aujourdHui = new Date();
+  const peremption = new Date(dateString);
+  const diffTime = peremption - aujourdHui;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays < 0 ? 0 : diffDays;
+}
+function afficherAliments() {
+  const recherche = document.getElementById("recherche").value.toLowerCase();
+  const ul = document.getElementById("listeAliments");
+  ul.innerHTML = "";
+  const ordreCategorie = ["Féculent", "Produit laitier", "Viande", "Poisson", "Fruit", "Légume", "Sucré", "Sec", "Sauce", "Epice", "Boisson", "Plat préparé", "Hygiène"];
+  aliments.sort((a, b) => ordreCategorie.indexOf(a.categorie) - ordreCategorie.indexOf(b.categorie));
+  let categorieActuelle = "";
+  aliments.forEach((aliment, index) => {
+    if (!aliment.nom.toLowerCase().includes(recherche)) return;
+    if (aliment.categorie !== categorieActuelle) {
+      categorieActuelle = aliment.categorie;
+      const titre = document.createElement("li");
+      titre.innerHTML = `<strong style="font-size:1.2em; color:#2c3e50;">${categorieActuelle}</strong>`;
+      ul.appendChild(titre);
+    }
+    const li = document.createElement("li");
+    li.style.cursor = "pointer";
+    li.onclick = (e) => {
+      if (e.target.tagName !== "BUTTON") ouvrirPopup(index);
+    };
+    let textePeremption = "";
+    if (aliment.peremption) {
+      const joursRestants = calculerJoursRestants(aliment.peremption);
+      textePeremption = ` - ${joursRestants} jour(s) restant`;
+      if (joursRestants <= 3) {
+        li.className = "urgent";
+        textePeremption += " - URGENT !";
+      } else {
+        li.className = "ok";
+      }
+    } else {
+      li.className = "ok";
+    }
+    let textePortions = "";
+    if (aliment.portions) {
+	    textePortions = ` (${aliment.quantite * aliment.portions} portions)`;
+    }
+    const blocQuantite = document.createElement("div");
+    blocQuantite.style.display = "flex";
+    blocQuantite.style.alignItems = "center";
+    blocQuantite.style.gap = "8px";
+    const btnMoins = document.createElement("button");
+    btnMoins.textContent = "−";
+    btnMoins.style.width = "35px";
+    const btnPlus = document.createElement("button");
+    btnPlus.textContent = "+";
+    btnPlus.style.width = "35px";
+    const spanTexte = document.createElement("span");
+    function majTexte() {
+      let txtPortions = aliment.portions ? ` (${aliment.quantite * aliment.portions} portions)` : "";
+      let txtPeremption = "";
+      if (aliment.peremption) {
+        const joursRestants = calculerJoursRestants(aliment.peremption);
+        txtPeremption = ` - ${joursRestants} jour(s) restant`;
+        if (joursRestants <= 3) txtPeremption += " - URGENT !";
+      }
+	  if (aliment.quantite > 0 && aliment.quantite < 1) {
+		  aliment.quantite = 1;
+	  }
+      spanTexte.innerHTML = `<strong>${aliment.nom}</strong><br>${aliment.quantite} ${aliment.unite}${txtPortions}${txtPeremption}`;
+    }
+    majTexte();
+    btnMoins.onclick = (e) => {
+      e.stopPropagation();
+	  if (aliment.portions > aliment.quantite) {
+      	if (aliment.portions > 0) {
+        	aliment.portions--;
+        	majTexte();
+        	sauvegarderAliments();
+      	}
+	  }
+	  else {
+		if (aliment.quantite > 0) {
+        	aliment.quantite--;
+        	majTexte();
+        	sauvegarderAliments();
+      	}
+	  }
+	  if (aliment.quantite === 0) {
+		  supprimerAliment(index);
+	  }
+    };
+    btnPlus.onclick = (e) => {
+      e.stopPropagation();
+      if (aliment.portions > aliment.quantite) {
+        	aliment.portions++;
+        	majTexte();
+        	sauvegarderAliments();
+	  }
+	  else {
+        	aliment.quantite++;
+        	majTexte();
+        	sauvegarderAliments();
+	  }
+    };
+    blocQuantite.appendChild(btnMoins);
+    blocQuantite.appendChild(spanTexte);
+    blocQuantite.appendChild(btnPlus);
+    li.appendChild(blocQuantite);
+    const btnSupprimer = document.createElement("button");
+    btnSupprimer.textContent = "Supprimer";
+    btnSupprimer.style.padding = "10px 16px";
+    btnSupprimer.style.fontSize = "1em";
+    btnSupprimer.style.background = "#e74c3c";
+    btnSupprimer.style.color = "white";
+    btnSupprimer.style.border = "none";
+    btnSupprimer.style.borderRadius = "6px";
+    btnSupprimer.onclick = (e) => {
+      e.stopPropagation();
+      supprimerAliment(index);
+    };
+    const actions = document.createElement("span");
+    actions.className = "actions";
+    actions.appendChild(btnSupprimer);
+    li.appendChild(actions);
+    ul.appendChild(li);
+  }); 
+}
+function supprimerAliment(index) {
+  if(confirm("Voulez-vous vraiment supprimer cet aliment ?")) {
+    aliments.splice(index, 1);
+    sauvegarderAliments();
+    afficherAliments();
+  }
+}
+// Pré-remplir le formulaire pour modifier
+function preRemplirFormulaire(index) {
+  const aliment = aliments[index];
+  document.getElementById("nom").value = aliment.nom;
+  document.getElementById("quantite").value = aliment.quantite;
+  document.getElementById("unite").value = aliment.unite;
+  document.getElementById("peremption").value = aliment.peremption;
+  document.getElementById("categorie").value = aliment.categorie;
+  document.getElementById("portions").value = aliment.portions;
+  indexEnCours = index;
+  document.querySelector("button[onclick='ajouterOuModifierAliment()']").textContent = "Modifier";
+}
+// Sauvegarde inventaire
+function exporterInventaire() {
+  const dataStr = JSON.stringify(aliments, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "inventaire.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importerInventaire(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      aliments = JSON.parse(e.target.result);
+      sauvegarderAliments();
+      afficherAliments();
+      alert("Inventaire restauré avec succès !");
+    } catch {
+      alert("Fichier invalide");
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* =========================
+   Repas
+========================= */
+let categoriesCourses = JSON.parse(localStorage.getItem("categoriesCourses")) || {};
+const toutesCategories = ["Féculent", "Produit laitier", "Viande", "Poisson", "Fruit", "Légume", "Sucré", "Sauce", "Epice", "Boisson", "Conserve", 
+                          "Produit du monde", "Hygiène"];
+  
+function sauvegarderRepas() {
+  const repasData = {};
+  document.querySelectorAll('.repas').forEach(input => {
+    const jour = input.dataset.jour;
+    const typeRepas = input.dataset.repas;
+    if (!repasData[jour]) repasData[jour] = {};
+    repasData[jour][typeRepas] = input.value;
+  });
+  localStorage.setItem('repasSemaine', JSON.stringify(repasData));
+  const btnSauvegarde = document.getElementById("btnSauvegardeRepas");
+  btnSauvegarde.onclick = () => {
+	alert("Repas sauvegardés !");
+  }
+}
+function chargerRepas() {
+  const repasData = JSON.parse(localStorage.getItem('repasSemaine'));
+  if (!repasData) return;
+
+  document.querySelectorAll('.repas').forEach(input => {
+    const jour = input.dataset.jour;
+    const typeRepas = input.dataset.repas;
+    input.value = repasData[jour] ? repasData[jour][typeRepas] || '' : '';
+  });
+}
+function genererListeCourses() {
+  const btnCourse = document.getElementById("btnListeCourse");
+  btnCourse.onclick = () => {
+  	if (confirm("Voulez-vous vous rendre sur la liste de course ?")) afficherPage('courses');
+  }
+  let inventaire = [];
+  try {
+    inventaire = JSON.parse(localStorage.getItem('aliments')) || [];
+  } catch {
+    inventaire = [];
+  }
+  const repasData = JSON.parse(localStorage.getItem('repasSemaine')) || {};
+  let categories = JSON.parse(localStorage.getItem("coursesCategories")) || {};
+  const totalDemandes = {};
+  const achatsInputs = {}; // ← stocke les champs "acheté"
+  Object.values(repasData).forEach(jour => {
+    Object.values(jour).forEach(texteRepas => {
+      if (!texteRepas) return;
+      const aliments = texteRepas
+        .split(',')
+        .map(a => a.trim())
+        .filter(a => a);
+      aliments.forEach(item => {
+        const match = item.match(/^(.+?)\s*(\d+)?$/);
+        if (!match) return;
+        const nom = match[1].trim();
+        const qte = Number(match[2]) || 1;
+        totalDemandes[nom] = (totalDemandes[nom] || 0) + qte;
+        if (!categories[nom]) categories[nom] = "Autres";
+      });
+    });
+  });
+  const courses = {};
+  Object.keys(totalDemandes).forEach(nom => {
+    const trouve = inventaire.find(a =>
+      a.nom.toLowerCase() === nom.toLowerCase()
+    );
+    const stock = trouve
+      ? Number(trouve.quantite) * (trouve.portions || 1)
+      : 0;
+    const besoin = Math.max(totalDemandes[nom] - stock, 0);
+    if (besoin > 0) courses[nom] = besoin;
+  });
+  const container = document.getElementById("listeCoursesContainer");
+  container.innerHTML = "";
+  const btnAjouterInventaire = document.createElement("button");
+  btnAjouterInventaire.textContent = "➕ Ajouter à l'inventaire";
+  btnAjouterInventaire.onclick = () => {
+    const checkedData = JSON.parse(localStorage.getItem("coursesChecked")) || {};
+    Object.keys(checkedData).forEach(nom => {
+      if (!checkedData[nom]) return;
+      const qteAchetee = Number(achatsInputs[nom]?.value) || 0;
+      if (qteAchetee <= 0) return;
+		const existant = aliments.find(a =>
+      	a.nom.toLowerCase() === nom.toLowerCase()
+   		);
+		if (existant) {
+      	// ✅ On additionne la quantité
+      		existant.quantite = Number(existant.quantite) + qteAchetee;
+    	} else {
+      		aliments.push({
+        		nom: nom,
+        		quantite: qteAchetee,
+        		unite: "",
+        		peremption: null,
+        		categorie: categories[nom] || "Autres"
+      		});
+    	}
+	});
+    localStorage.setItem("aliments", JSON.stringify(aliments));
+    localStorage.removeItem("coursesChecked");
+    genererListeCourses();
+    afficherAliments();
+  };
+  container.appendChild(btnAjouterInventaire);
+  if (Object.keys(courses).length === 0) {
+    container.innerHTML += "<p>✅ Tout est déjà dans l'inventaire.</p>";
+    return;
+  }
+  const ordreCategories = [
+    "Autres",
+    "Féculent", "Produit laitier", "Viande", "Poisson",
+    "Fruit", "Légume", "Sucré", "Sauce",
+    "Epice", "Boisson", "Conserve", "Produit du monde", "Hygiène"
+  ];
+  ordreCategories.forEach(categorie => {
+    const alimentsDeCategorie =
+      Object.keys(courses).filter(nom => categories[nom] === categorie);
+    if (alimentsDeCategorie.length === 0) return;
+    const titre = document.createElement("p");
+    titre.textContent = categorie;
+    titre.style.fontWeight = "bold";
+    titre.style.fontSize = "1.2em";
+    titre.style.marginTop = "12px";
+    container.appendChild(titre);
+    const ul = document.createElement("ul");
+    alimentsDeCategorie.forEach(nom => {
+      const li = document.createElement("li");
+      li.style.display = "flex";
+      li.style.alignItems = "center";
+      li.style.gap = "10px";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className = "course-checkbox";
+      const span = document.createElement("span");
+      span.textContent = `${nom}  (besoin : ${courses[nom]})`;
+      span.style.flex = "1";
+      const inputAchat = document.createElement("input");
+      inputAchat.type = "number";
+      inputAchat.value = courses[nom];
+      inputAchat.style.width = "70px";
+      achatsInputs[nom] = inputAchat;
+      checkbox.onchange = () => {
+        const data = JSON.parse(localStorage.getItem("coursesChecked")) || {};
+        data[nom] = checkbox.checked;
+        localStorage.setItem("coursesChecked", JSON.stringify(data));
+      };
+      const select = document.createElement("select");
+      ordreCategories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        if (cat === categorie) option.selected = true;
+        select.appendChild(option);
+      });
+      select.onchange = () => {
+        categories[nom] = select.value;
+        localStorage.setItem("coursesCategories", JSON.stringify(categories));
+        genererListeCourses();
+      };
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(inputAchat);
+      li.appendChild(select);
+      ul.appendChild(li);
+    });
+    container.appendChild(ul);
+  });
+  localStorage.setItem("coursesCategories", JSON.stringify(categories));
+}
+
+function nouvelleSemaine() {
+  if (!confirm("Voulez-vous vraiment commencer une nouvelle semaine ? Toutes les cases seront vidées.")) return;
+  document.querySelectorAll('.repas').forEach(input => input.value = '');
+  localStorage.removeItem('repasSemaine');
+  document.getElementById("repasSemaine").innerHTML = "";
+  alert("Nouvelle semaine prête ! Toutes les cases ont été vidées.");
+}
+function repasCuisiné() {
+  if (!confirm("Retirer les ingrédients du stock et marquer le repas comme fait ?")) return;
+  if (!inputRepasActif) return;
+  const texteRepas = document.getElementById("repasTexte").value.trim();
+  if (!texteRepas) return;
+  let inventaire = JSON.parse(localStorage.getItem("aliments")) || [];
+  const ingredients = texteRepas
+    .split(',')
+    .map(a => a.trim())
+    .filter(a => a)
+    .map(item => {
+      const parts = item.split(/\s+/).filter(Boolean);
+      const last = parts[parts.length - 1] || "";
+      const parsed = Number(last.replace(",", "."));
+      const quantite = Number.isNaN(parsed) ? 1 : parsed;
+      const nom = Number.isNaN(parsed) ? item : parts.slice(0, -1).join(" ");
+      return {
+        nom: nom.trim(),
+        quantite
+      };
+    })
+    .filter(ingredient => ingredient.nom);
+  ingredients.forEach(ingredient => {
+    const alim = inventaire.find(a =>
+      a.nom.toLowerCase() === ingredient.nom.toLowerCase()
+    );
+    if (!alim) return;
+    if (alim.portions) {
+      let portionsStock = alim.quantite * alim.portions;
+      portionsStock -= ingredient.quantite;
+      alim.quantite = Math.max(
+        portionsStock / alim.portions,
+        0
+      );
+    } else {
+      alim.quantite = Math.max(
+        alim.quantite - ingredient.quantite,
+        0
+      );
+    }
+  });
+  aliments = inventaire;
+  localStorage.setItem("aliments", JSON.stringify(inventaire));
+  inputRepasActif.value = "";
+  document.getElementById("repasTexte").value = "";
+  sauvegarderRepas();
+  afficherAliments();
+  genererListeCourses();
+  fermerPopupRepas();
+  alert("✅ Repas validé, stock mis à jour !");
+}
+
+/* =========================
+   Recette
+========================= */
+let recettes = [];
+let indexRecetteEnCours = -1;
+
+function chargerRecettes() {
+  const data = localStorage.getItem("recettes");
+  if(data) recettes = JSON.parse(data);
+}
+function sauvegarderRecettes() {
+  localStorage.setItem("recettes", JSON.stringify(recettes));
+}
+function ajouterRecette() {
+  const nom = document.getElementById("recetteNom").value.trim();
+  const ingredients = document.getElementById("recetteIngredients").value.split(",").map(i => i.trim()).filter(i => i);
+  if(!nom || ingredients.length === 0) {
+    alert("Veuillez remplir le nom et les ingrédients !");
+    return;
+  }
+  recettes.push({nom, ingredients});
+  document.getElementById("recetteNom").value = "";
+  document.getElementById("recetteIngredients").value = "";
+  sauvegarderRecettes();
+  afficherRecettes();
+}
+function afficherRecettes() {
+  const ul = document.getElementById("listeRecettes");
+  ul.innerHTML = "";
+  recettes.forEach((recette, index) => {
+    const li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    li.style.alignItems = "center";
+    li.style.marginBottom = "5px";
+    const span = document.createElement("span");
+    span.textContent = `${recette.nom} (${recette.ingredients.join(", ")})`;
+    li.appendChild(span);
+    const btnAjouterRepas = document.createElement("button");
+    btnAjouterRepas.textContent = "➡️ Ajouter au repas";
+	btnAjouterRepas.style.padding = "6px 12px";
+	btnAjouterRepas.style.marginLeft = "auto";
+    btnAjouterRepas.onclick = () => ouvrirPopupRecette(index);
+    li.appendChild(btnAjouterRepas);
+    const btnSupprimer = document.createElement("button");
+    btnSupprimer.textContent = "Supprimer";
+    btnSupprimer.style.padding = "6px 12px";
+    btnSupprimer.style.marginLeft = "5px";
+    btnSupprimer.style.background = "#e74c3c";
+    btnSupprimer.style.color = "white";
+    btnSupprimer.onclick = () => {
+      if(confirm(`Supprimer la recette "${recette.nom}" ?`)) {
+        recettes.splice(index, 1);
+        sauvegarderRecettes();
+        afficherRecettes();
+      }
+    };
+    li.appendChild(btnSupprimer);
+    ul.appendChild(li);
+  });
+}
+
+/* =========================
+   PROPRETÉ
+========================= */
+const tachesProprete = {
+  "Cuisine": ["Plan de travail", "Plaques", "Sol", "Poubelle", "Nettoyer Frigo, Micro-onde,..."],
+  "Salle de bain": ["Lavabo", "Douche", "WC", "Miroir", "Sol"],
+  "Salon": ["Rangement", "Aspirateur", "Serpillère"],
+  "Chambre": ["Draps", "Rangement", "Aspirateur"]
+};
+function afficherProprete() {
+  const container = document.getElementById("listeTachesProprete");
+  container.innerHTML = "";
+  const data = JSON.parse(localStorage.getItem("propreteEtat")) || {};
+  Object.keys(tachesProprete).forEach(piece => {
+    const divRoom = document.createElement("div");
+    divRoom.className = "room";
+    const titre = document.createElement("h3");
+    titre.textContent = piece;
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+    const progressFill = document.createElement("div");
+    progressFill.className = "progress-fill";
+    progressBar.appendChild(progressFill);
+    divRoom.appendChild(titre);
+    divRoom.appendChild(progressBar);
+    let total = tachesProprete[piece].length;
+    let cochees = 0;
+    const majProgression = () => {
+      const pourcentage = Math.round((cochees / total) * 100);
+      progressFill.style.width = pourcentage + "%";
+    };
+    tachesProprete[piece].forEach(tache => {
+      const label = document.createElement("label");
+      label.className = "task";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      const key = piece + "_" + tache;
+      checkbox.checked = data[key] || false;
+      if (checkbox.checked) cochees++;
+      checkbox.onchange = () => {
+        const etat = JSON.parse(localStorage.getItem("propreteEtat")) || {};
+        etat[key] = checkbox.checked;
+        localStorage.setItem("propreteEtat", JSON.stringify(etat));
+        cochees += checkbox.checked ? 1 : -1;
+        majProgression();
+      };
+      const span = document.createElement("span");
+      span.textContent = tache;
+      label.appendChild(checkbox);
+      label.appendChild(span);
+
+      divRoom.appendChild(label);
+    });
+    majProgression();
+    container.appendChild(divRoom);
+  });
+}
+function resetProprete() {
+  if (!confirm("Commencer une nouvelle semaine ? Toutes les cases seront décochées.")) return;
+  localStorage.removeItem("propreteEtat");
+  afficherProprete();
+}
+
+/* =========================
+   BUDGET
+========================= */
+let depenses = [];
+function getMoisActuel() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
+}
+function afficherBudgetOnglet(onglet) {
+  document.getElementById("budget-depenses").style.display = "none";
+  document.getElementById("budget-graphique").style.display = "none";
+  document.getElementById("budget-historique").style.display = "none";
+  if(onglet === "depenses") {
+    document.getElementById("budget-depenses").style.display = "block";
+  }
+  if(onglet === "graphique") {
+    document.getElementById("budget-graphique").style.display = "block";
+    genererGraphique();
+  }
+  if(onglet === "historique") {
+    document.getElementById("budget-historique").style.display = "block";
+    afficherHistorique();
+  }
+}
+function genererGraphique(){
+  const ctx = document.getElementById("budgetPieChart").getContext("2d");
+  const legend = document.getElementById("budgetLegend");
+  legend.innerHTML = "";
+  const data = {};
+  depenses.forEach(d => {
+    const cat = d.categorie;
+    const montant = parseFloat(d.montant) || 0;
+    if(!data[cat]) data[cat] = 0;
+    data[cat] += montant;
+  });
+  const total = Object.values(data).reduce((a, b) => a + b, 0);
+  if(total === 0){
+    ctx.clearRect(0, 0, 300, 300);
+    legend.innerHTML = "<li>Aucune dépense enregistrée</li>";
+    return;
+  }
+  const colors = ["#e74c3c","#3498db","#2ecc71","#f1c40f","#9b59b6","#1abc9c","#e67e22","#9e9e9e","#ff69b4","#8b4513"];
+  ctx.clearRect(0, 0, 300, 300);
+  let startAngle = 0;
+  let i = 0;
+  for(const cat in data){
+    const sliceAngle = (data[cat] / total) * 2 * Math.PI;
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.moveTo(150, 150);
+    ctx.arc(150, 150, 150, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fill();
+    const li = document.createElement("li");
+    li.textContent = `${cat} : ${data[cat].toFixed(2)} €`;
+    li.style.color = colors[i % colors.length];
+    li.style.fontWeight = "bold";
+    legend.appendChild(li);
+    startAngle += sliceAngle;
+    i++;
+  }
+}
+// Charger
+function chargerDepenses() {
+  const data = localStorage.getItem("budgetDepenses");
+  if(data) depenses = JSON.parse(data);
+}
+// Sauvegarder
+function sauvegarderDepenses() {
+  localStorage.setItem("budgetDepenses", JSON.stringify(depenses));
+}
+// Ajouter
+function ajouterDepense() {
+  const montant = parseFloat(document.getElementById("budgetMontant").value);
+  const categorie = document.getElementById("budgetCategorie").value;
+  const note = document.getElementById("budgetNote").value;
+  if(!montant || montant <= 0) {
+    alert("Montant invalide");
+    return;
+  }
+  const nouvelleDepense = {
+    id: Date.now(),
+    montant: Number(montant),
+    categorie,
+    note,
+    date: new Date().toISOString()
+  };
+  depenses.push(nouvelleDepense);
+  sauvegarderDansHistorique(nouvelleDepense);
+  document.getElementById("budgetMontant").value = "";
+  document.getElementById("budgetNote").value = "";
+  sauvegarderDepenses();
+  afficherDepenses();
+}
+// Supprimer
+function supprimerDepense(id) {
+  depenses = depenses.filter(d => d.id !== id);
+  sauvegarderDepenses();
+  supprimerDeHistorique(id);
+  afficherDepenses();
+}
+// Afficher
+function afficherDepenses() {
+  const ul = document.getElementById("budgetListe");
+  ul.innerHTML = "";
+  const depensesTriees = {};
+  depenses.forEach((d, index) => {
+    if (!depensesTriees[d.categorie]) depensesTriees[d.categorie] = [];
+    depensesTriees[d.categorie].push(d);
+  });
+  Object.keys(depensesTriees).forEach(categorie => {
+    const titre = document.createElement("li");
+    titre.innerHTML = `<strong>${categorie}</strong>`;
+    ul.appendChild(titre);
+    depensesTriees[categorie].forEach(d => {
+      const li = document.createElement("li");
+      const span = document.createElement("span");
+      span.textContent = `${d.note} : ${d.montant} €`;
+      const btnSupprimer = document.createElement("button");
+      btnSupprimer.textContent = "Supprimer";
+      btnSupprimer.style.padding = "10px 16px";
+      btnSupprimer.style.fontSize = "1em";
+      btnSupprimer.style.background = "#e74c3c";
+      btnSupprimer.style.color = "white";
+      btnSupprimer.style.border = "none";
+      btnSupprimer.style.borderRadius = "6px";
+      btnSupprimer.onclick = () => {
+        if (confirm("Supprimer cette dépense ?")) {
+          supprimerDepense(d.id);
+        }
+      };
+      const actions = document.createElement("span");
+      actions.className = "actions";
+      actions.appendChild(btnSupprimer);
+      li.appendChild(span);
+      li.appendChild(actions);
+      ul.appendChild(li);
+    });
+  });
+  const total = depenses.reduce((s, d) => s + d.montant, 0);
+  document.getElementById("budgetTotal").textContent = total.toFixed(2) + " €";
+}
+function nouveauMois() {
+  if (!confirm("Voulez-vous vraiment commencer un nouveau mois ?")) return;
+  depenses = [];
+  localStorage.removeItem("budgetDepenses");
+  afficherDepenses();
+  alert("Nouveau mois prêt !");
+}
+function sauvegarderDansHistorique(depense) {
+  const historique = JSON.parse(localStorage.getItem("budgetHistorique")) || {};
+  const mois = getMoisActuel();
+  if(!historique[mois]) historique[mois] = [];
+  historique[mois].push(depense);
+  localStorage.setItem("budgetHistorique", JSON.stringify(historique));
+}
+function afficherHistorique() {
+  const ul = document.getElementById("historiqueListe");
+  ul.innerHTML = "";
+  const historique = JSON.parse(localStorage.getItem("budgetHistorique")) || {};
+  const mois = Object.keys(historique).sort().reverse();
+  if(mois.length === 0){
+    ul.innerHTML = "<li>Aucun historique</li>";
+    return;
+  }
+  mois.forEach(m => {
+    const li = document.createElement("li");
+    li.style.display = "flex";
+    li.style.justifyContent = "space-between";
+    li.style.alignItems = "center";
+    li.style.padding = "8px 0";
+    const total = historique[m].reduce((s,d)=>s+d.montant,0);
+    const span = document.createElement("span");
+    span.textContent = `${m} — ${total.toFixed(2)} €`;
+    span.style.cursor = "pointer";
+    span.onclick = () => ouvrirPopupHistorique(m);
+    const btn = document.createElement("button");
+    btn.textContent = "🗑";
+    btn.className = "delete-btn";
+    btn.style.width = "auto";
+    btn.onclick = () => supprimerMoisHistorique(m);
+    li.appendChild(span);
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+}
+function ouvrirPopupHistorique(mois) {
+  const historique = JSON.parse(localStorage.getItem("budgetHistorique")) || {};
+  const details = historique[mois] || [];
+  const groupes = {};
+  details.forEach(d => {
+    if (!groupes[d.categorie]) groupes[d.categorie] = [];
+    groupes[d.categorie].push(d);
+  });
+  let html = "";
+  Object.keys(groupes).sort().forEach(cat => {
+    groupes[cat].sort((a,b) => b.montant - a.montant);
+    const totalCat = groupes[cat].reduce((s,d) => s + d.montant, 0).toFixed(2);
+    html += `<h3>${cat} — ${totalCat} €</h3>`;
+    groupes[cat].forEach(d => {
+      html += `
+        <div class="list-item">
+          <span>${d.note}</span>
+          <strong>${d.montant.toFixed(2)} €</strong>
+        </div>
+      `;
+    });
+  });
+  document.getElementById("historiqueDetails").innerHTML = html;
+  document.getElementById("historiqueTitre").textContent = "Détails " + mois;
+  document.getElementById("popupHistorique").style.display = "flex";
+}
+function fermerPopupHistorique() {
+  document.getElementById("popupHistorique").style.display = "none";
+}
+function supprimerDeHistorique(id){
+  const historique = JSON.parse(localStorage.getItem("budgetHistorique")) || {};
+  Object.keys(historique).forEach(mois => {
+    historique[mois] = historique[mois].filter(d => d.id !== id);
+  });
+  localStorage.setItem("budgetHistorique", JSON.stringify(historique));
+}
+function verifierChangementDeMois() {
+  const moisActuel = getMoisActuel();
+  const moisSauvegarde = localStorage.getItem("budgetMoisActuel");
+  if(!moisSauvegarde){
+    localStorage.setItem("budgetMoisActuel", moisActuel);
+    return;
+  }
+  if(moisSauvegarde !== moisActuel){
+    depenses = [];
+    localStorage.setItem("budgetDepenses", JSON.stringify(depenses));
+    localStorage.setItem("budgetMoisActuel", moisActuel);
+  }
+}
+function supprimerMoisHistorique(mois){
+  if(!confirm("Supprimer tout l'historique de " + mois + " ?")) return;
+
+  const historique = JSON.parse(localStorage.getItem("budgetHistorique")) || {};
+
+  delete historique[mois];
+
+  localStorage.setItem("budgetHistorique", JSON.stringify(historique));
+
+  afficherHistorique();
+}
+function grouperParCategorie(depenses) {
+  const groupes = {};
+  depenses.forEach(d => {
+    if (!groupes[d.categorie]) groupes[d.categorie] = [];
+    groupes[d.categorie].push(d);
+  });
+  return groupes;
+}
+
+/* =========================
+   Navigation
+========================= */
+function afficherPage(page) {
+  document.querySelectorAll(".card").forEach(p => p.style.display = "none");
+  document.getElementById("page-" + page).style.display = "block";
+  if(page === "proprete") {
+    afficherProprete();
+  }
+  if(page === "historique") {
+    afficherHistorique();
+  }
+}
+
+/* =========================
+   Initialisation
+========================= */
+chargerAliments();
+afficherAliments();
+chargerDepenses();
+verifierChangementDeMois();
+afficherDepenses();
+afficherPage("inventaire");
+
+</script>
+<script>
+
+/* =========================
+   Pop-Up modifier aliment
+========================= */
+let indexEdition = -1;
+function ouvrirPopup(index) {
+  const aliment = aliments[index];
+  indexEdition = index;
+  document.getElementById("editNom").value = aliment.nom;
+  document.getElementById("editQuantite").value = aliment.quantite;
+  document.getElementById("editUnite").value = aliment.unite;
+  document.getElementById("editPortions").value = aliment.portions;
+  const checkbox = document.getElementById("editSansDate");
+  const dateInput = document.getElementById("editPeremption");
+  if (!aliment.peremption) {
+    checkbox.checked = true;
+    dateInput.disabled = true;
+    dateInput.style.visibility = "hidden";
+    dateInput.value = ""; 
+  } else {
+    checkbox.checked = false;
+    dateInput.disabled = false;
+    dateInput.style.visibility = "visible";
+    dateInput.value = aliment.peremption;
+  }
+  checkbox.addEventListener("change", function() {
+    if (this.checked) {
+      dateInput.disabled = true;
+      dateInput.style.visibility = "hidden";
+    } else {
+      dateInput.disabled = false;
+      dateInput.style.visibility = "visible";
+      if (aliment.peremption) dateInput.value = aliment.peremption;
+    }
+  });
+  const select = document.getElementById("editCategorie");
+  select.innerHTML = "";
+  const options = ["Choisir Catégorie","Boisson","Produit laitier","Légume","Fruit","Viande","Poisson","Féculent","Sucré","Sauce","Epice","Sec",
+                   "Plat préparé","Hygiène"];
+  options.forEach(cat => {
+    const o = document.createElement("option");
+    o.value = cat;
+    o.textContent = cat;
+    if(cat === aliment.categorie) o.selected = true;
+    select.appendChild(o);
+  });
+  document.getElementById("popupEdit").style.display = "flex";
+}
+function fermerPopup() {
+  document.getElementById("popupEdit").style.display = "none";
+}
+function sauvegarderEdition() {
+  if(indexEdition === -1) return;
+  const sansDate = document.getElementById("editSansDate").checked;
+  aliments[indexEdition] = {
+    nom: document.getElementById("editNom").value,
+    quantite: document.getElementById("editQuantite").value,
+    unite: document.getElementById("editUnite").value,
+    peremption: sansDate ? null : document.getElementById("editPeremption").value,
+    categorie: document.getElementById("editCategorie").value,
+    portions: document.getElementById("editPortions").value
+  };
+  sauvegarderAliments();
+  afficherAliments();
+  fermerPopup();
+}
+function supprimerDepuisPopup() {
+  if(confirm("Supprimer cet aliment ?")) {
+    aliments.splice(indexEdition, 1);
+    sauvegarderAliments();
+    afficherAliments();
+    fermerPopup();
+  }
+}
+
+/* =========================
+   Pop-Up ajouter recette à repas
+========================= */ 
+function ouvrirPopupRecette(index) {
+  indexRecetteEnCours = index;
+  document.getElementById("popupRecette").style.display = "flex";
+}
+function fermerPopupRecette() {
+  document.getElementById("popupRecette").style.display = "none";
+}
+function confirmerAjoutRecette() {
+  if(indexRecetteEnCours === -1) return;
+  const recette = recettes[indexRecetteEnCours];
+  const jour = document.getElementById("recetteJour").value;
+  const typeRepas = document.getElementById("recetteTypeRepas").value;
+  const input = document.querySelector(`input[data-jour="${jour}"][data-repas="${typeRepas}"]`);
+  if(!input) {
+    alert("Le champ de repas correspondant n'a pas été trouvé !");
+    fermerPopupRecette();
+    return;
+  }
+  const valeursExistantes = input.value ? input.value.split(",").map(v => v.trim()) : [];
+  const nouvellesValeurs = [...valeursExistantes, ...recette.ingredients];
+  input.value = nouvellesValeurs.join(", ");
+  alert(`Recette "${recette.nom}" ajoutée à ${jour} - ${typeRepas} !`);
+  fermerPopupRecette();
+}
+//Initialisation
+chargerRecettes();
+afficherRecettes();
+
+/* =========================
+   Pop-Up modifier repas
+========================= */
+let inputRepasActif = null;
+function ouvrirPopupRepas(input) {
+  inputRepasActif = input;
+  const jour = input.dataset.jour;
+  const type = input.dataset.repas;
+  document.getElementById("repasTitre").textContent =`${jour} - ${type}`;
+  document.getElementById("repasTexte").value = input.value;
+  document.getElementById("popupRepasEdit").style.display = "flex";
+}
+function fermerPopupRepas() {
+  document.getElementById("popupRepasEdit").style.display = "none";
+}
+function sauvegarderRepasPopup() {
+  if (!inputRepasActif) return;
+  inputRepasActif.value =document.getElementById("repasTexte").value;
+  fermerPopupRepas();
+}
+</script>
+
+
+
+<!-- ==========================
+   POPUPS
+========================== -->
+<!-- Modifier un aliment -->
+<div id="popupEdit" class="popup">
+  <div class="popup-content">
+    <h2>Modifier l'aliment</h2>
+    <input id="editNom" placeholder="Nom">
+    <input id="editQuantite" type="number" placeholder="Quantité">
+    <input id="editUnite" placeholder="Unité">
+    <input type="number" id="editPortions" placeholder="Portions par unité">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <input id="editPeremption" type="date" style="flex:1;">
+      <label style="display:flex; align-items:center; gap:5px;">
+        <input type="checkbox" id="editSansDate">Pas de DLC</label>
+    </div>
+    <select id="editCategorie"></select>
+    <div class="popup-actions">
+      <button onclick="sauvegarderEdition()">💾 Sauvegarder</button>
+      <button onclick="fermerPopup()">Annuler</button>
+    </div>
+    <button class="delete-btn" onclick="supprimerDepuisPopup()">🗑 Supprimer</button>
+  </div>
+</div>
+
+<!-- Ajouter une recette au repas -->
+<div id="popupRecette" class="popup">
+  <div class="popup-content">
+    <h2>Ajouter la recette à un repas</h2>
+    <p>Sélectionnez le jour et le type de repas :</p>
+    <label>Jour :</label>
+    <select id="recetteJour">
+      <option value="Lundi">Lundi</option>
+      <option value="Mardi">Mardi</option>
+      <option value="Mercredi">Mercredi</option>
+      <option value="Jeudi">Jeudi</option>
+      <option value="Vendredi">Vendredi</option>
+      <option value="Samedi">Samedi</option>
+      <option value="Dimanche">Dimanche</option>
+    </select>
+    <label>Repas :</label>
+    <select id="recetteTypeRepas">
+      <option value="Petit-déjeuner">Petit-déjeuner</option>
+      <option value="Déjeuner">Déjeuner</option>
+      <option value="Dîner">Dîner</option>
+      <option value="Autre">Autre</option>
+    </select>
+    <div class="popup-actions">
+      <button onclick="confirmerAjoutRecette()">💾 Ajouter</button>
+      <button onclick="fermerPopupRecette()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ajouter un repas -->
+<div id="popupRepasEdit" class="popup">
+  <div class="popup-content">
+    <h2>Modifier le repas</h2>
+    <p id="repasTitre"></p>
+    <textarea id="repasTexte"
+              style="min-height:120px; font-size:1.2em;"
+              placeholder="Ex: Pâtes, Tomates, Fromage">
+    </textarea>
+    <div class="popup-actions">
+      <button onclick="sauvegarderRepasPopup()">💾 Sauvegarder</button>
+      <button onclick="fermerPopupRepas()">Annuler</button>
+      <button onclick="repasCuisiné()" style="background:#2ecc71;">✅ Repas cuisiné</button>
+    </div>
+  </div>
+</div>
+
+<!-- Historique budget -->
+<div id="popupHistorique" class="popup">
+  <div class="popup-content">
+    <h2 id="historiqueTitre"></h2>
+    <ul id="historiqueDetails"></ul>
+
+    <div class="popup-actions">
+      <button onclick="fermerPopupHistorique()">Fermer</button>
+    </div>
+  </div>
+</div>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('Service Worker enregistré :', reg))
+      .catch(err => console.log('Erreur enregistrement SW :', err));
+  });
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
